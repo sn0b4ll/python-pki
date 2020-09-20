@@ -187,7 +187,7 @@ class MyPrompt(Cmd):
             ]
         )
         print(t.draw())
-        
+
         what_to_export = self._get_san_input_int("What to export :", 3)
         val = self._get_cert_info_as_string(cert, what_to_export)
 

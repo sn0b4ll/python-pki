@@ -1,6 +1,9 @@
 import configparser
+import random
+import string
+import sys
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
@@ -8,17 +11,22 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from OpenSSL import crypto
 
-engine = create_engine('sqlite:///test.db')
-Base = declarative_base()
-
 config = configparser.ConfigParser()
 config.read('config.conf')
 
-# Only needed for new key
-# key = Fernet.generate_key()
 
-FERNETKEY = config['ENCRYPTION']['key']
-f = Fernet(FERNETKEY)
+engine = create_engine(config['DB']['con_string'])
+Base = declarative_base()
+
+NEW_DB = False
+
+if not engine.dialect.has_table(engine, 'certs'):
+    # DB does no exist yet, create a new key
+    FERNETKEY = Fernet.generate_key()
+    NEW_DB = True
+else:
+    CHALLENGE, FERNETKEY = input("Please enter the secret: ").split(":")
+    FERNETKEY = FERNETKEY.encode('utf-8')
 
 
 class CA(Base):
@@ -61,7 +69,7 @@ class CERT(Base):
     cert = Column(String)
     key = Column(String)
     ca_id = Column(Integer, ForeignKey('cas.id'))
-    ca = relationship("CA", back_populates="certs")   
+    ca = relationship("CA", back_populates="certs") 
 
     def __init__(self, desc, cert, key, ca):
         self.desc = desc
@@ -87,7 +95,47 @@ class CERT(Base):
         )
 
 
+class EncTest(Base):
+    __tablename__ = 'enctest'
+    cipher_suite = Fernet(FERNETKEY)
+
+    testval = Column(String, primary_key=True)
+
+    def __init__(self, testval):
+        self.testval = self.cipher_suite.encrypt(bytes(testval, encoding='utf8'))
+
+    def check(self, testval):
+        try:
+            decrypted = self.cipher_suite.decrypt(self.testval).decode('utf-8')
+            if testval == decrypted:
+                return True
+            else:
+                return False
+        except InvalidToken:
+            return False
+
+
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+
+if NEW_DB:
+    challenge = ''.join(
+        random.choice(string.ascii_lowercase) for i in range(15)
+    )
+    print("++++++++++++ Key ++++++++++++")
+    print("{}:{}".format(challenge, FERNETKEY.decode('utf-8')))
+    print("+ Please write this key down +")
+    print("+++++++++++++++++++++++++++++")
+    input("\nPress enter to continue..")
+
+    test_val = EncTest(challenge)
+    session.add(test_val)
+    session.commit()
+else:
+    enctest = session.query(EncTest).one()
+    if not enctest.check(CHALLENGE):
+        print("Sorry, wrong secret!")
+        sys.exit()
