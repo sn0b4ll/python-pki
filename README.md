@@ -1,4 +1,8 @@
 # python-pki
+## How-To-Use
+`python3 -m pip install -r requirements.txt`
+`python3 main.py`
+
 ## Description
 This is an small python-tool for managing an CA with Client-Certificates for small environments.
 
