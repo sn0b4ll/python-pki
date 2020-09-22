@@ -1,6 +1,12 @@
 # python-pki
 ## How-To-Use
+First and only one time run:
+
 `python3 -m pip install -r requirements.txt`
+
+
+Afterwards you can start the tool with:
+
 `python3 main.py`
 
 ## Description
