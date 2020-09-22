@@ -19,7 +19,7 @@ Name | Description
 --- | ---
 help | Shows all available commands
 addca | Adds an new CA
-addcert | Adds an new Certificate, signed by an CA)
+addcert | Adds an new Certificate, signed by an CA
 getcas | Shows all stored CAs
 getcerts | Shows all stored Certs
 getcertsforca | Show all Cert for an CA
