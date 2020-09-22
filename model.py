@@ -5,6 +5,8 @@ import sys
 
 from cryptography.fernet import Fernet, InvalidToken
 
+from getpass import getpass
+
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,7 +27,7 @@ if not engine.dialect.has_table(engine, 'certs'):
     FERNETKEY = Fernet.generate_key()
     NEW_DB = True
 else:
-    CHALLENGE, FERNETKEY = input("Please enter the secret: ").split(":")
+    CHALLENGE, FERNETKEY = getpass("Please enter the secret: ").split(":")
     FERNETKEY = FERNETKEY.encode('utf-8')
 
 
@@ -69,7 +71,7 @@ class CERT(Base):
     cert = Column(String)
     key = Column(String)
     ca_id = Column(Integer, ForeignKey('cas.id'))
-    ca = relationship("CA", back_populates="certs") 
+    ca = relationship("CA", back_populates="certs")
 
     def __init__(self, desc, cert, key, ca):
         self.desc = desc
@@ -102,7 +104,9 @@ class EncTest(Base):
     testval = Column(String, primary_key=True)
 
     def __init__(self, testval):
-        self.testval = self.cipher_suite.encrypt(bytes(testval, encoding='utf8'))
+        self.testval = self.cipher_suite.encrypt(
+            bytes(testval, encoding='utf8')
+        )
 
     def check(self, testval):
         try:

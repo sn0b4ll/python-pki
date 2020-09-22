@@ -132,3 +132,14 @@ def gen_cert(ca):
     cert = crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8")
 
     return cert, key
+
+
+def create_pkcs12(key, cert, password):
+    cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
+    key = crypto.load_privatekey(crypto.FILETYPE_PEM, key)
+    # pfx = crypto.PKCS12Type()
+    pfx = crypto.PKCS12()
+    pfx.set_privatekey(key)
+    pfx.set_certificate(cert)
+    pfxdata = pfx.export(password)
+    return pfxdata

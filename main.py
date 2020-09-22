@@ -1,5 +1,6 @@
-from certificates import gen_ca, gen_cert
+from certificates import gen_ca, gen_cert, create_pkcs12
 from cmd import Cmd
+from getpass import getpass
 from model import session, CA, CERT
 from texttable import Texttable
 
@@ -105,14 +106,19 @@ class MyPrompt(Cmd):
             )
         print(t.draw())
 
-    def _get_cert_info_as_string(self, ca, what_to_export):
+    def _get_cert_info_as_string(self, cert, what_to_export):
         '''Export whatever is selected'''
         if what_to_export == 1:
-            return ca.get_key()
+            return cert.get_key()
         elif what_to_export == 2:
-            return ca.get_cert()
+            return cert.get_cert()
         elif what_to_export == 3:
-            return ca.get_pub()
+            return cert.get_pub()
+        elif what_to_export == 4:
+            key = cert.get_key()
+            cert = cert.get_cert()
+            password = getpass()
+            return create_pkcs12(key, cert, password)
         else:
             raise Exception("Value out of range.")
 
@@ -132,10 +138,14 @@ class MyPrompt(Cmd):
 
         if target == 1:
             # Export to file
-            print("File")
             filename = input("Choose filename: ")
+
             f = open(filename, 'wb')
-            f.write(val.encode('utf-8'))
+            # Hacky, but PKCS12 comes as bytes while the others do not :/
+            try:
+                f.write(val.encode('utf-8'))
+            except AttributeError:
+                f.write(val)
             f.close()
             print("Data was saved to {}".format(filename))
         elif target == 2:
@@ -181,14 +191,15 @@ class MyPrompt(Cmd):
         t.add_rows(
             [
                 ['ID', 'Target'],
-                ['1', 'private key'],
-                ['2', 'certificate'],
-                ['3', 'public key']
+                ['1', 'private key (PEM)'],
+                ['2', 'certificate (CRT)'],
+                ['3', 'public key (PEM)'],
+                ['4', 'packed and pw-protected (PKCS12)'],
             ]
         )
         print(t.draw())
 
-        what_to_export = self._get_san_input_int("What to export :", 3)
+        what_to_export = self._get_san_input_int("What to export :", 4)
         val = self._get_cert_info_as_string(cert, what_to_export)
 
         self._export_val(val)
