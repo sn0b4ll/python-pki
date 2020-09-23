@@ -1,7 +1,7 @@
-from certificates import gen_ca, gen_cert, create_pkcs12
+from crypto.certificates import gen_ca, gen_cert, create_pkcs12
 from cmd import Cmd
 from getpass import getpass
-from model import session, CA, CERT
+from db.model import session, CA, CERT
 from texttable import Texttable
 
 
@@ -176,7 +176,6 @@ class MyPrompt(Cmd):
             "Choose an certificate to export: ",
             num_certs
         )
-        print(cert_id, type(cert_id))
         cert = session.query(CERT).filter(CERT.id == cert_id).one()
 
         # Ask user what to export
