@@ -27,7 +27,11 @@ if not engine.dialect.has_table(engine, 'certs'):
     FERNETKEY = Fernet.generate_key()
     NEW_DB = True
 else:
-    CHALLENGE, FERNETKEY = getpass("Please enter the secret: ").split(":")
+    try:
+        CHALLENGE, FERNETKEY = getpass("Please enter the secret: ").split(":")
+    except ValueError:
+        print("[!] Secret in wrong format!")
+        sys.exit()
     FERNETKEY = FERNETKEY.encode('utf-8')
 
 
