@@ -4,7 +4,7 @@ First and only one time run:
 
 `python3 -m pip install -r requirements.txt`
 
-and copy the `config.conf_dummy` to `config.conf`. Adjust the values as needed.
+and copy the `template/config.conf_dummy` to `./config.conf`. Adjust the values as needed.
 
 Afterwards you can start the tool with:
 

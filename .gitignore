@@ -1,7 +1,7 @@
 # Custom
 .vscode
 test.db
-config.conf
+/config.conf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
