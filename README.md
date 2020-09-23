@@ -8,7 +8,7 @@ and copy the `config.conf_dummy` to `config.conf`. Adjust the values as needed.
 
 Afterwards you can start the tool with:
 
-`python3 main.py`
+`python3 python-pki.py`
 
 ## Description
 This is an small python-tool for managing an CA with Client-Certificates for small environments.
