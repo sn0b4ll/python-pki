@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from crypto.certificates import gen_ca, gen_cert, create_pkcs12
+from crypto.certificates import gen_ca_interactive, gen_cert, create_pkcs12
 from cmd import Cmd
 from getpass import getpass
 from db.model import session, CA, CERT
@@ -48,7 +48,7 @@ class Console(Cmd):
 
     def do_addca(self, inp):
         '''Create a new CA'''
-        cert, key = gen_ca()
+        cert, key = gen_ca_interactive()
         desc = input("Please enter an description: ")
         ca = CA(desc, cert, key)
         session.add(ca)
@@ -66,7 +66,7 @@ class Console(Cmd):
         ca = session.query(CA).filter(CA.id == ca_id).one()
 
         # Generate CERT, create an DB-Obj and add to session
-        cert, key = gen_cert(ca)
+        cert, key = gen_cert(ca=ca)
         desc = input("Please enter an description: ")
         cert = CERT(desc, cert, key, ca)
         session.add(cert)

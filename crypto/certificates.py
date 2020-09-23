@@ -8,7 +8,7 @@ config.read('config.conf')
 cert_conf = config['CERTIFICATES']
 
 
-def gen_ca(sing_ca=None):
+def gen_ca_interactive(sing_ca=None):
     # https://stackoverflow.com/questions/27164354/create-a-self-signed-x509-certificate-in-python
     # can look at generated file using openssl:
     # openssl x509 -inform pem -in selfsigned.crt -noout -text
@@ -64,6 +64,32 @@ def gen_ca(sing_ca=None):
     validityStartInSeconds = 0
     validityEndInSeconds = 10*365*24*60*60
 
+    return gen_ca_noninter(
+        countryName,
+        stateOrProvinceName,
+        localityName,
+        organizationName,
+        organizationUnitName,
+        commonName,
+        emailAddress,
+        serialNumber,
+        validityStartInSeconds,
+        validityEndInSeconds
+    )
+
+
+def gen_ca_noninter(
+    countryName,
+    stateOrProvinceName,
+    localityName,
+    organizationName,
+    organizationUnitName,
+    commonName,
+    emailAddress,
+    serialNumber,
+    validityStartInSeconds,
+    validityEndInSeconds
+):
     # create a key pair
     k = crypto.PKey()
     k.generate_key(crypto.TYPE_RSA, 4096)
@@ -89,7 +115,7 @@ def gen_ca(sing_ca=None):
     return cert, key
 
 
-def gen_cert(ca):
+def gen_cert(ca=None, ca_key=None, ca_cert=None, commonName=None):
     '''Create an CERT signed by an given CA'''
 
     # Generate a CSR
@@ -98,24 +124,24 @@ def gen_cert(ca):
     key.generate_key(crypto.TYPE_RSA, 4096)
 
     req = crypto.X509Req()
-    req.get_subject().CN = input("CommonName: ")
+    if commonName is None:
+        commonName = input("CommonName: ")
+    req.get_subject().CN = commonName
     req.set_pubkey(key)
     req.sign(key, "sha512")
 
-    req = crypto.dump_certificate_request(
-        crypto.FILETYPE_PEM, req
-    ).decode("utf-8")
     key = crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8")
 
-    # Load cert and key
+    # Load cert and key if an ca is supplied
+    if ca is not None:
+        ca_cert = ca.get_cert()
+        ca_key = ca.get_key()
+
     ca_cert = crypto.load_certificate(
-        crypto.FILETYPE_PEM, bytes(ca.get_cert(), 'utf-8')
+        crypto.FILETYPE_PEM, bytes(ca_cert, 'utf-8')
     )
     ca_key = crypto.load_privatekey(
-        crypto.FILETYPE_PEM, bytes(ca.get_key(), 'utf-8')
-    )
-    req = crypto.load_certificate_request(
-        crypto.FILETYPE_PEM, bytes(req, 'utf-8')
+        crypto.FILETYPE_PEM, bytes(ca_key, 'utf-8')
     )
 
     # Generate Cert
