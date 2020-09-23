@@ -7,11 +7,6 @@ config.read('config.conf')
 
 cert_conf = config['CERTIFICATES']
 
-'''
-'%x' % cert.get_serial_number()
-
-'''
-
 
 def gen_ca(sing_ca=None):
     # https://stackoverflow.com/questions/27164354/create-a-self-signed-x509-certificate-in-python
@@ -111,13 +106,8 @@ def gen_cert(ca):
         crypto.FILETYPE_PEM, req
     ).decode("utf-8")
     key = crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8")
-    # print(req)
-    # print(type(req))
-    # print(key)
 
     # Load cert and key
-    # print(ca.get_cert())
-    # print(ca.get_key())
     ca_cert = crypto.load_certificate(
         crypto.FILETYPE_PEM, bytes(ca.get_cert(), 'utf-8')
     )
