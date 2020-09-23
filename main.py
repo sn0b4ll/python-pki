@@ -4,13 +4,6 @@ from getpass import getpass
 from model import session, CA, CERT
 from texttable import Texttable
 
-'''
-TOOD
-    - export
-    - logging
-    - testing
-'''
-
 
 class MyPrompt(Cmd):
     def _get_san_input_int(self, message, bound):
@@ -48,7 +41,7 @@ class MyPrompt(Cmd):
 
     def do_exit(self, inp):
         '''Exit'''
-        print("Bye")
+        print("For Feedback, please visit the github-page :)")
         return True
 
     def do_addca(self, inp):
@@ -165,9 +158,9 @@ class MyPrompt(Cmd):
         t.add_rows(
             [
                 ['ID', 'Target'],
-                ['1', 'private key'],
-                ['2', 'certificate'],
-                ['3', 'public key']
+                ['1', 'private key (PEM)'],
+                ['2', 'certificate (CRT)'],
+                ['3', 'public key (PEM)']
             ]
         )
         print(t.draw())
