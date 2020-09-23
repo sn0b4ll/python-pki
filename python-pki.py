@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from crypto.certificates import gen_ca, gen_cert, create_pkcs12
 from cmd import Cmd
 from getpass import getpass
