@@ -21,13 +21,22 @@ def gen_ca(sing_ca=None):
     # Get Input from user
     emailAddress = input("EmailAddress: ")
     commonName = input("CommonName: ")
-    countryName = (
-        input(
-            "Nation (emtpy for conf: {}): ".format(
-                cert_conf['country']
-            )
-        ) or cert_conf['country']
-    )
+
+    while True:
+        countryName = (
+            input(
+                "Country-Code (emtpy for conf: {}): ".format(
+                    cert_conf['country']
+                )
+            ) or cert_conf['country']
+        )
+        if len(countryName) > 2:
+            # This is not a restriction made by me, but enforced
+            # by pyOpenSsl
+            print("Country-Code must be 2 chars in length.")
+        else:
+            break
+
     localityName = (
         input(
             "LocalityName (emtpy for conf: {}): ".format(
