@@ -1,4 +1,6 @@
 import configparser
+import random
+import sys
 
 from OpenSSL import crypto
 
@@ -60,7 +62,7 @@ def gen_ca_interactive(sing_ca=None):
             )
         ) or cert_conf['unit']
     )
-    serialNumber = 0
+    serialNumber = random.randint(0, sys.maxsize)
     validityStartInSeconds = 0
     validityEndInSeconds = 10*365*24*60*60
 
@@ -147,7 +149,7 @@ def gen_cert(ca=None, ca_key=None, ca_cert=None, commonName=None):
     # Generate Cert
     cert = crypto.X509()
     cert.set_subject(req.get_subject())
-    cert.set_serial_number(1)
+    cert.set_serial_number(random.randint(0, sys.maxsize))
     cert.gmtime_adj_notBefore(0)
     cert.gmtime_adj_notAfter(1*365*24*60*60)
     cert.set_issuer(ca_cert.get_subject())
