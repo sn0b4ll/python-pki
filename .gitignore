@@ -2,6 +2,7 @@
 .vscode
 test.db
 /config.conf
+*.pem
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
