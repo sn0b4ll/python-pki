@@ -34,7 +34,7 @@ parser.add_argument(
 parser.add_argument(
     "--store-db",
     action="store_true",
-    help="add the generated ca/certs to the db?"
+    help="add the generated ca/certs to the db? (not yet implemented)"
 )
 
 args = parser.parse_args()

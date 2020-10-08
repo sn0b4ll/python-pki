@@ -170,3 +170,21 @@ def create_pkcs12(key, cert, password):
     pfx.set_certificate(cert)
     pfxdata = pfx.export(password)
     return pfxdata
+
+
+def validate_format_certificate(data):
+    '''Checks if given (byte) data is a valid cert'''
+    try:
+        crypto.load_certificate(crypto.FILETYPE_PEM, data)
+        return True
+    except Exception:
+        return False
+
+
+def validate_format_privatekey(data):
+    '''Checks if given (byte) data is a valid privkey'''
+    try:
+        crypto.load_privatekey(crypto.FILETYPE_PEM, data)
+        return True
+    except Exception:
+        return False

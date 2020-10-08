@@ -48,7 +48,10 @@ class CA(Base):
     def __init__(self, desc, cert, key):
         self.desc = desc
         self.cert = cert
-        self.key = self.cipher_suite.encrypt(bytes(key, encoding='utf8'))
+        try:
+            self.key = self.cipher_suite.encrypt(bytes(key, encoding='utf8'))
+        except TypeError:
+            self.key = self.cipher_suite.encrypt(key)
 
     def get_key(self):
         return self.cipher_suite.decrypt(self.key).decode('utf-8')

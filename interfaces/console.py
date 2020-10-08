@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
+import os.path
 
 from crypto.certificates import gen_ca_interactive, gen_cert, create_pkcs12
+from crypto.certificates import validate_format_certificate
+from crypto.certificates import validate_format_privatekey
 from cmd import Cmd
 from getpass import getpass
 from db.model import session, CA, CERT
@@ -197,3 +200,43 @@ class Console(Cmd):
         val = self._get_cert_info_as_string(cert, what_to_export)
 
         self._export_val(val)
+
+    def do_importcertforca(self, inp):
+        '''Import an certificate for an existing CA'''
+        pass
+
+    def do_importca(self, inp):
+        '''Import an CA'''
+        # TODO(Option for PK12)
+        path_key = input(
+            "Please enter the path to the CAs private key-file: "
+        ).strip()
+        path_cert = input(
+            "Please enter the path to the CAs cert-file: "
+        ).strip()
+
+        # Check if path is valid
+        if (
+            (not os.path.isfile(path_key)) or (not os.path.isfile(path_cert))
+                ):
+            print("[!] One of the provided paths does not point to an file.")
+            return
+
+        # Read both files
+        f = open(path_key, 'rb')
+        key = f.read()
+        f.close()
+
+        f = open(path_cert, 'rb')
+        cert = f.read()
+        f.close()
+
+        # If valid, create and commit the DB-Object
+        if (validate_format_privatekey(key)
+                and validate_format_certificate(cert)):
+            desc = input("Please enter an description: ")
+            ca = CA(desc, cert, key)
+            session.add(ca)
+            session.commit()
+        else:
+            print("[!] One of the files is not in an correct PEM-Format")
