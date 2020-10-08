@@ -205,14 +205,14 @@ class Console(Cmd):
         '''Import an certificate for an existing CA'''
         pass
 
-    def do_importca(self, inp):
-        '''Import an CA'''
+    def _load_key_and_cert_from_file(self):
+        '''Asks for paths and loads key and cert'''
         # TODO(Option for PK12)
         path_key = input(
-            "Please enter the path to the CAs private key-file: "
+            "Please enter the path to the private key-file: "
         ).strip()
         path_cert = input(
-            "Please enter the path to the CAs cert-file: "
+            "Please enter the path to the cert-file: "
         ).strip()
 
         # Check if path is valid
@@ -234,9 +234,38 @@ class Console(Cmd):
         # If valid, create and commit the DB-Object
         if (validate_format_privatekey(key)
                 and validate_format_certificate(cert)):
-            desc = input("Please enter an description: ")
-            ca = CA(desc, cert, key)
-            session.add(ca)
-            session.commit()
+            return key.decode('utf-8'), cert.decode('utf-8')
         else:
-            print("[!] One of the files is not in an correct PEM-Format")
+            raise Exception(
+                "[!] One of the files is not in an correct PEM-Format"
+            )
+
+    def do_importca(self, inp):
+        '''Import an CA'''
+        # Get the key and cert from file
+        key, cert = self._load_key_and_cert_from_file()
+
+        # Enrich with description
+        desc = input("Please enter an description: ")
+
+        # Creat DB-Object and commit
+        ca = CA(desc, cert, key)
+        session.add(ca)
+        session.commit()
+
+    def do_importcert(self, inp):
+        '''Import an Cert'''
+
+        # Get ca_id to export by user and extract from db
+        self._print_cas()
+        ca_id = input("CA to use for signing: ")
+        ca = session.query(CA).filter(CA.id == ca_id).one()
+
+        # Get the key and cert from file
+        key, cert = self._load_key_and_cert_from_file()
+
+        # Creat DB-Object and commit
+        desc = input("Please enter an description: ")
+        cert = CERT(desc, cert, key, ca)
+        session.add(cert)
+        session.commit()
