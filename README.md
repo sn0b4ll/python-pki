@@ -40,6 +40,7 @@ Param | Description
 --- | ---
 --json | path to the json file
 --out-dir | the output dir (can already exist or will be created)
+--store-db | store the read ca and certs in the db
 
 An example json can be found in the templates folder.
 
