@@ -10,6 +10,11 @@ from crypto.certificates import gen_ca_noninter, gen_cert, create_pkcs12
 class Noninteractive:
 
     def __init__(self, args):
+
+        if args.store_db:
+            # Only import if db-storage is requested
+            from db.model import session, CA, CERT
+
         print("[+] Reading JSON")
         f = open(args.json, 'r')
         try:
@@ -48,6 +53,11 @@ class Noninteractive:
             path, "", ca_json['ca']['commonName'] + ".crt", ca_cert
         )
 
+        if args.store_db:
+            ca = CA("Imported vis JSON", ca_cert, ca_key)
+            session.add(ca)
+            session.commit()
+
         # Generate certificates
         print("[+] Generating Certs")
         password = ''.join(
@@ -80,6 +90,11 @@ class Noninteractive:
             self._write_to_disk(
                 path, subfix, cert_req['commonName'] + ".p12", pk12
             )
+
+            if args.store_db:
+                cert = CERT("Imported vis JSON", cert, key, ca)
+                session.add(cert)
+                session.commit()
 
     def _write_to_disk(self, path, path_subfix, filename, data):
         '''Writes to disk what is passed as data'''
