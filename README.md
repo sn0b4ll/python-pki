@@ -22,8 +22,8 @@ The interactive console provides the following functions:
 Name | Description
 --- | ---
 help | Shows all available commands
-addca | Adds an new CA
-addcert | Adds an new Certificate, signed by an CA
+genca | Adds an new CA
+gencert | Adds an new Certificate, signed by an CA
 getcas | Shows all stored CAs
 getcerts | Shows all stored Certs
 getcertsforca | Show all Cert for an CA

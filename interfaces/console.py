@@ -49,7 +49,7 @@ class Console(Cmd):
         print("For Feedback, please visit the github-page :)")
         return True
 
-    def do_addca(self, inp):
+    def do_genca(self, inp):
         '''Create a new CA'''
         cert, key = gen_ca_interactive()
         desc = input("Please enter an description: ")
@@ -57,7 +57,7 @@ class Console(Cmd):
         session.add(ca)
         session.commit()
 
-    def do_addcert(self, inp):
+    def do_gencert(self, inp):
         '''Add an CERT to an CA'''
         # Print existing CAs
         self._print_cas()
